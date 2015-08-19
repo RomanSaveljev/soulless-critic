@@ -1,0 +1,39 @@
+{
+  "name": "soulless-critic",
+  "version": "0.0.1",
+  "description": "Runs code style checks and comments on Gerrit reviews",
+  "main": "index.js",
+  "repository": "RomanSaveljev/soulless-critic",
+  "scripts": {
+    "test": "make test-all",
+    "travis-test": "make travis-test",
+    "cov": "make cov-all"
+  },
+  "config": {
+    "blanket": {
+      "pattern": "//^((?!(node_modules|test)).)*$/"
+    },
+    "travis-cov": {
+      "threshold": 98
+    }
+  },
+  "dependencies": {
+    "gerrit-event-emitter": "^0.1.5",
+    "git": "^0.1.5"
+  },
+  "devDependencies": {
+    "should": "*",
+    "blanket": "*",
+    "travis-cov": "*",
+    "mocha-lcov-reporter": "*",
+    "mocha": "*"
+  },
+  "keywords": [
+    "jenkins-job-builder"
+  ],
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "author": "Roman Saveljev <roman.saveljev@haltian.com>",
+  "license": "MIT"
+}
