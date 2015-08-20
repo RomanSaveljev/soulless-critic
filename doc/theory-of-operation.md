@@ -50,6 +50,12 @@ $ git checkout FETCH_HEAD
 * `PORT` - configured Gerrit port
 * `EVENT` - event received to patchset created callback
 
+### Concurrency
+
+The above is gives only a simplistic view. In practice, asynchronous operations
+imply some concurrency support. For instance, new event may come from the Gerrit
+stream while we are checking out the change.
+
 ## Scope of checking
 
 A style checker will analyze every modified file completely. This command lists changed files:
@@ -107,4 +113,3 @@ Example of JSON:
     }
 }
 ```
-

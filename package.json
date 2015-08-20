@@ -19,9 +19,15 @@
   },
   "dependencies": {
     "URIjs": "^1.16.0",
+    "async": "^1.4.2",
+    "better-assert": "^1.0.2",
+    "file-exists": "^0.1.1",
     "gerrit-event-emitter": "^0.1.5",
-    //"mkdirp": "^0.5.1",
-    "nodegit": "^0.4.1"
+    "mktemp": "^0.4.0",
+    "node-linguist": "^1.0.5",
+    "procstreams": "^0.3.0",
+    "xmldom": "^0.1.19",
+    "xpath": "0.0.9"
   },
   "devDependencies": {
     "should": "*",
@@ -31,7 +37,9 @@
     "mocha": "*"
   },
   "keywords": [
-    "jenkins-job-builder"
+    "gerrit",
+    "checkstyle",
+    "java"
   ],
   "engines": {
     "node": ">= 0.8.0"
