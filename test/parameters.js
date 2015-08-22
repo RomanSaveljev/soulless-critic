@@ -64,6 +64,25 @@ describe('Parameters', function() {
       should(parameters.eventData.change.project).be.equal(project);
     });
   });
+  describe('gitCloneBase', function() {
+    it('is function', function() {
+      var parameters = new Parameters();
+      should(parameters.gitCloneBase).be.Function();
+    });
+    it('extracts git.base', function() {
+      var base = 'ssh://john@localhost:29418';
+      var parameters = new Parameters();
+      parameters.git = {};
+      parameters.git.base = base;
+      should(parameters.gitCloneBase()).be.equal(base);
+    });
+    it('plants git.base', function() {
+      var base = 'ssh://hacker@google.com:1337';
+      var parameters = new Parameters();
+      parameters.gitCloneBase(base);
+      should(parameters.git.base).be.equal(base);
+    });
+  });
   describe('ref', function() {
     it('is function', function() {
       var parameters = new Parameters();
