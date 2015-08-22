@@ -224,31 +224,52 @@ describe('Parameters', function() {
       });
     });
   });
-  describe('gitCloneProjectPath', function() {
+  describe('gitClonePath', function() {
     it('is function', function() {
       var parameters = new Parameters();
-      should(parameters.gitCloneProjectPath).be.Function();
+      should(parameters.gitClonePath).be.Function();
     });
     it('derives from gitCloneProject()', function() {
       var project = 'project';
       var parameters = new Parameters();
       parameters.gitCloneProject(project, 'ssh://somewhere:5678/project.git');
       parameters.project(project);
-      should(parameters.gitCloneProjectPath()).be.equal('projects/somewhere/5678/project.git');
+      should(parameters.gitClonePath()).be.equal('projects/somewhere/5678/project.git');
     });
     it('derives from gitCloneProject() without port number', function() {
       var project = 'project';
       var parameters = new Parameters();
       parameters.gitCloneProject(project, 'ssh://somewhere/project.git');
       parameters.project(project);
-      should(parameters.gitCloneProjectPath()).be.equal('projects/somewhere/default/project.git');
+      should(parameters.gitClonePath()).be.equal('projects/somewhere/default/project.git');
     });
     it('derives from gitCloneProject() with username', function() {
       var project = 'project';
       var parameters = new Parameters();
       parameters.gitCloneProject(project, 'ssh://someone@somewhere:44444/project.git');
       parameters.project(project);
-      should(parameters.gitCloneProjectPath()).be.equal('projects/somewhere/44444/project.git');
+      should(parameters.gitClonePath()).be.equal('projects/somewhere/44444/project.git');
     });
   });
+  describe('gitCloneBranch', function() {
+    it('is function', function() {
+      var parameters = new Parameters();
+      should(parameters.gitCloneBranch).be.Function();
+    });
+    it('builds from change() and patch()', function() {
+      var parameters = new Parameters();
+      parameters.change(5);
+      parameters.patch(3);
+      should(parameters.gitCloneBranch()).be.equal('5/3');
+    });
+    it('returns undefined if no change() or patch()', function() {
+      var parameters = new Parameters();
+      should(parameters.gitCloneBranch()).be.undefined();
+      parameters.change(6);
+      should(parameters.gitCloneBranch()).be.undefined();
+      parameters = new Parameters();
+      parameters.patch(8);
+      should(parameters.gitCloneBranch()).be.undefined();
+    });
+  })
 });
