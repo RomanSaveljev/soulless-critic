@@ -42,6 +42,28 @@ describe('Parameters', function() {
       should(parameters.eventData.patchSet.number).be.equal(72);
     });
   });
+  describe('project', function() {
+    it('is function', function() {
+      var parameters = new Parameters();
+      should(parameters.project).be.Function();
+    });
+    it('extracts eventData.change.project', function() {
+      var project = 'my-project';
+      var parameters = new Parameters();
+      parameters.eventData = {};
+      parameters.eventData.change = {};
+      parameters.eventData.change.project = project;
+      should(parameters.project()).be.equal(project);
+    });
+    it('plants eventData.change.project', function() {
+      var project = 'cool-stuff';
+      var parameters = new Parameters();
+      parameters.project(project);
+      should(parameters.eventData).be.Object();
+      should(parameters.eventData.change).be.Object();
+      should(parameters.eventData.change.project).be.equal(project);
+    });
+  });
   describe('ref', function() {
     it('is function', function() {
       var parameters = new Parameters();
@@ -104,5 +126,4 @@ describe('Parameters', function() {
       });
     });
   });
-
 });
