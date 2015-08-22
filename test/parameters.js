@@ -224,4 +224,31 @@ describe('Parameters', function() {
       });
     });
   });
+  describe('gitCloneProjectPath', function() {
+    it('is function', function() {
+      var parameters = new Parameters();
+      should(parameters.gitCloneProjectPath).be.Function();
+    });
+    it('derives from gitCloneProject()', function() {
+      var project = 'project';
+      var parameters = new Parameters();
+      parameters.gitCloneProject(project, 'ssh://somewhere:5678/project.git');
+      parameters.project(project);
+      should(parameters.gitCloneProjectPath()).be.equal('projects/somewhere/5678/project.git');
+    });
+    it('derives from gitCloneProject() without port number', function() {
+      var project = 'project';
+      var parameters = new Parameters();
+      parameters.gitCloneProject(project, 'ssh://somewhere/project.git');
+      parameters.project(project);
+      should(parameters.gitCloneProjectPath()).be.equal('projects/somewhere/default/project.git');
+    });
+    it('derives from gitCloneProject() with username', function() {
+      var project = 'project';
+      var parameters = new Parameters();
+      parameters.gitCloneProject(project, 'ssh://someone@somewhere:44444/project.git');
+      parameters.project(project);
+      should(parameters.gitCloneProjectPath()).be.equal('projects/somewhere/44444/project.git');
+    });
+  });
 });
