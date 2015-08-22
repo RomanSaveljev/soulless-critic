@@ -1,5 +1,6 @@
 var Parameters = require('../lib/parameters');
 var should = require('should');
+var URI = require('URIjs');
 
 describe('Parameters', function() {
   describe('change', function() {
@@ -74,13 +75,24 @@ describe('Parameters', function() {
       var parameters = new Parameters();
       parameters.git = {};
       parameters.git.base = base;
-      should(parameters.gitCloneBase()).be.equal(base);
+      should(parameters.gitCloneBase().equals(base)).be.true();
     });
     it('plants git.base', function() {
       var base = 'ssh://hacker@google.com:1337';
       var parameters = new Parameters();
       parameters.gitCloneBase(base);
       should(parameters.git.base).be.equal(base);
+    });
+    it('returns URI object', function() {
+      var parameters = new Parameters();
+      parameters.gitCloneBase('http://www.abc.com');
+      should(parameters.gitCloneBase()).be.instanceof(URI);
+    });
+    it('accepts URI object', function() {
+      var url = 'ssh://blackho.le';
+      var parameters = new Parameters();
+      parameters.gitCloneBase(URI(url));
+      should(parameters.gitCloneBase().equals(url)).be.true();
     });
   });
   describe('gitCloneProject', function() {
@@ -95,13 +107,59 @@ describe('Parameters', function() {
       parameters.git = {};
       parameters.git.clone = {};
       parameters.git.clone[project] = clone;
-      should(parameters.gitCloneProject(project)).be.equal(clone);
+      should(parameters.gitCloneProject(project).equals(clone)).be.true();
     });
-    it('plants git.base', function() {
-      var base = 'ssh://hacker@google.com:1337';
+    it('plants git.clone[project]', function() {
+      var clone = 'ssh://smeagol@misty-mountains:29418/my-preciouss.git';
+      var project = 'my-precioussss';
       var parameters = new Parameters();
-      parameters.gitCloneBase(base);
-      should(parameters.git.base).be.equal(base);
+      parameters.gitCloneProject(project, clone);
+      should(parameters.git.clone[project]).be.equal(clone);
+    });
+    it('returns URL for project() by default', function() {
+      var clone = 'http://www.google.com/hidden.git';
+      var project = 'hidden';
+      var parameters = new Parameters();
+      parameters.project(project);
+      parameters.gitCloneProject(project, clone);
+      should(parameters.gitCloneProject().equals(clone)).be.true();
+    });
+    it('returns undefined, when project is not known', function() {
+      var parameters = new Parameters();
+      should(parameters.gitCloneProject()).be.undefined();
+    });
+    it('builds default project clone url', function() {
+      var parameters = new Parameters();
+      parameters.gitCloneBase('ssh://www.microsoft.com:6666');
+      parameters.project('domination-plans');
+      var expected = 'ssh://www.microsoft.com:6666/domination-plans';
+      should(parameters.gitCloneProject().equals(expected)).be.true();
+    });
+    it('returns URI object', function() {
+      var parameters = new Parameters();
+      parameters.gitCloneBase('ssh://www.microsoft.com:6666');
+      parameters.project('domination-plans');
+      should(parameters.gitCloneProject()).be.instanceof(URI);
+    });
+    it('assignment overrides defaults', function() {
+      var project = 'cats';
+      var destination = 'ssh://cats.co/cats';
+      var parameters = new Parameters();
+      parameters.gitCloneBase('ssh://www.microsoft.com:6666');
+      parameters.project(project);
+      parameters.gitCloneProject(project, destination);
+      should(parameters.gitCloneProject().equals(destination)).be.true();
+    });
+    it('supports multiple projects', function() {
+      var projectOne = 'one';
+      var projectTwo = 'two';
+      var destinationOne = 'ssh://a.a/one';
+      var destinationTwo = 'ssh://b.b/two';
+      var parameters = new Parameters();
+      parameters.gitCloneProject(projectOne, destinationOne);
+      parameters.gitCloneProject(projectTwo, destinationTwo);
+      should(parameters.gitCloneProject(projectOne).equals(destinationOne)).be.true();
+      should(parameters.gitCloneProject(projectTwo).equals(destinationTwo)).be.true();
     });
   });
   describe('ref', function() {
