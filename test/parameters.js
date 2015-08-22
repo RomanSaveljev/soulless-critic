@@ -83,6 +83,27 @@ describe('Parameters', function() {
       should(parameters.git.base).be.equal(base);
     });
   });
+  describe('gitCloneProject', function() {
+    it('is function', function() {
+      var parameters = new Parameters();
+      should(parameters.gitCloneProject).be.Function();
+    });
+    it('extracts git.clone[project]', function() {
+      var clone = 'ssh://john@localhost:29418/super-stuff.git';
+      var project = 'super-stuff';
+      var parameters = new Parameters();
+      parameters.git = {};
+      parameters.git.clone = {};
+      parameters.git.clone[project] = clone;
+      should(parameters.gitCloneProject(project)).be.equal(clone);
+    });
+    it('plants git.base', function() {
+      var base = 'ssh://hacker@google.com:1337';
+      var parameters = new Parameters();
+      parameters.gitCloneBase(base);
+      should(parameters.git.base).be.equal(base);
+    });
+  });
   describe('ref', function() {
     it('is function', function() {
       var parameters = new Parameters();
