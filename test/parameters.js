@@ -42,5 +42,67 @@ describe('Parameters', function() {
       should(parameters.eventData.patchSet.number).be.equal(72);
     });
   });
+  describe('ref', function() {
+    it('is function', function() {
+      var parameters = new Parameters();
+      should(parameters.ref).be.Function();
+    });
+    it('extracts eventData.patchSet.ref', function() {
+      var ref = 'refs/changes/19/19/2';
+      var parameters = new Parameters();
+      parameters.eventData = {};
+      parameters.eventData.patchSet = {};
+      parameters.eventData.patchSet.ref = ref;
+      should(parameters.ref()).be.equal(ref);
+    });
+    it('plants eventData.patchSet.ref', function() {
+      var ref = 'refs/changes/03/103/2';
+      var parameters = new Parameters();
+      parameters.ref(ref);
+      should(parameters.eventData).be.Object();
+      should(parameters.eventData.patchSet).be.Object();
+      should(parameters.eventData.patchSet.ref).be.equal(ref);
+    });
+    it('ref assignment overrides default', function() {
+      var ref = 'refs/changes/05/1105/1';
+      var parameters = new Parameters();
+      parameters.change(4);
+      parameters.patch(2);
+      parameters.ref(ref);
+      should(parameters.ref()).be.equal(ref);
+    });
+    describe('builds default refspec', function() {
+      it('patch number is respected', function() {
+        var parameters = new Parameters();
+        parameters.change(2);
+        parameters.patch(1);
+        should(parameters.ref()).be.equal('refs/changes/02/2/1');
+        parameters.patch(10);
+        should(parameters.ref()).be.equal('refs/changes/02/2/10');
+        parameters.patch(100);
+        should(parameters.ref()).be.equal('refs/changes/02/2/100');
+      });
+      it('change number is respected', function() {
+        var parameters = new Parameters();
+        parameters.patch(1);
+        parameters.change(1);
+        should(parameters.ref()).be.equal('refs/changes/01/1/1');
+        parameters.change(12);
+        should(parameters.ref()).be.equal('refs/changes/12/12/1');
+        parameters.change(215);
+        should(parameters.ref()).be.equal('refs/changes/15/215/1');
+      });
+      it('returns undefined if no patch', function() {
+        var parameters = new Parameters();
+        parameters.change(2);
+        should(parameters.ref()).be.undefined();
+      });
+      it('returns undefined if no change', function() {
+        var parameters = new Parameters();
+        parameters.patch(3);
+        should(parameters.ref()).be.undefined();
+      });
+    });
+  });
 
 });
