@@ -65,90 +65,91 @@ describe('Parameters', function() {
       should(parameters.eventData.change.project).be.equal(project);
     });
   });
-  describe('gitCloneBase', function() {
+  describe('gitServer', function() {
     it('is function', function() {
       var parameters = new Parameters();
-      should(parameters.gitCloneBase).be.Function();
+      should(parameters.gitServer).be.Function();
     });
-    it('extracts git.base', function() {
-      var base = 'ssh://john@localhost:29418';
+    it('extracts git.server', function() {
+      var server = 'ssh://john@localhost:29418';
       var parameters = new Parameters();
       parameters.git = {};
-      parameters.git.base = base;
-      should(parameters.gitCloneBase().equals(base)).be.true();
+      parameters.git.server = server;
+      should(parameters.gitServer().equals(server)).be.true();
     });
-    it('plants git.base', function() {
-      var base = 'ssh://hacker@google.com:1337';
+    it('plants git.server', function() {
+      var server = 'ssh://hacker@google.com:1337';
       var parameters = new Parameters();
-      parameters.gitCloneBase(base);
-      should(parameters.git.base).be.equal(base);
+      parameters.gitServer(server);
+      should(parameters.git.server).be.equal(server);
     });
     it('returns URI object', function() {
       var parameters = new Parameters();
-      parameters.gitCloneBase('http://www.abc.com');
-      should(parameters.gitCloneBase()).be.instanceof(URI);
+      parameters.gitServer('http://www.abc.com');
+      should(parameters.gitServer()).be.instanceof(URI);
     });
     it('accepts URI object', function() {
       var url = 'ssh://blackho.le';
       var parameters = new Parameters();
-      parameters.gitCloneBase(URI(url));
-      should(parameters.gitCloneBase().equals(url)).be.true();
+      parameters.gitServer(URI(url));
+      should(parameters.gitServer().equals(url)).be.true();
     });
   });
-  describe('gitCloneProject', function() {
+  describe('projectCloneUrl', function() {
     it('is function', function() {
       var parameters = new Parameters();
-      should(parameters.gitCloneProject).be.Function();
+      should(parameters.projectCloneUrl).be.Function();
     });
     it('extracts git.clone[project]', function() {
       var clone = 'ssh://john@localhost:29418/super-stuff.git';
       var project = 'super-stuff';
       var parameters = new Parameters();
       parameters.git = {};
-      parameters.git.clone = {};
-      parameters.git.clone[project] = clone;
-      should(parameters.gitCloneProject(project).equals(clone)).be.true();
+      parameters.git.project = {};
+      parameters.git.project.clone = {};
+      parameters.git.project.clone[project] = clone;
+      should(parameters.projectCloneUrl(project).equals(clone)).be.true();
     });
     it('plants git.clone[project]', function() {
       var clone = 'ssh://smeagol@misty-mountains:29418/my-preciouss.git';
       var project = 'my-precioussss';
       var parameters = new Parameters();
-      parameters.gitCloneProject(project, clone);
-      should(parameters.git.clone[project]).be.equal(clone);
+      parameters.projectCloneUrl(project, clone);
+      should(parameters.git.project.clone[project]).be.equal(clone);
     });
     it('returns URL for project() by default', function() {
       var clone = 'http://www.google.com/hidden.git';
       var project = 'hidden';
       var parameters = new Parameters();
       parameters.project(project);
-      parameters.gitCloneProject(project, clone);
-      should(parameters.gitCloneProject().equals(clone)).be.true();
+      parameters.projectCloneUrl(project, clone);
+      should(parameters.projectCloneUrl().equals(clone)).be.true();
     });
     it('returns undefined, when project is not known', function() {
       var parameters = new Parameters();
-      should(parameters.gitCloneProject()).be.undefined();
+      should(parameters.projectCloneUrl()).be.undefined();
     });
     it('builds default project clone url', function() {
       var parameters = new Parameters();
-      parameters.gitCloneBase('ssh://www.microsoft.com:6666');
+      parameters.gitServer('ssh://www.microsoft.com:6666');
       parameters.project('domination-plans');
       var expected = 'ssh://www.microsoft.com:6666/domination-plans';
-      should(parameters.gitCloneProject().equals(expected)).be.true();
+      should(parameters.projectCloneUrl().equals(expected)).be.true();
     });
     it('returns URI object', function() {
       var parameters = new Parameters();
-      parameters.gitCloneBase('ssh://www.microsoft.com:6666');
+      parameters.gitServer('ssh://www.microsoft.com:6666');
       parameters.project('domination-plans');
-      should(parameters.gitCloneProject()).be.instanceof(URI);
+      should(parameters.projectCloneUrl()).be.instanceof(URI);
     });
     it('assignment overrides defaults', function() {
       var project = 'cats';
       var destination = 'ssh://cats.co/cats';
       var parameters = new Parameters();
-      parameters.gitCloneBase('ssh://www.microsoft.com:6666');
+      parameters.gitServer('ssh://www.microsoft.com:6666');
       parameters.project(project);
-      parameters.gitCloneProject(project, destination);
-      should(parameters.gitCloneProject().equals(destination)).be.true();
+      parameters.projectCloneUrl(project, destination);
+      should(parameters.projectCloneUrl().equals(destination)).be.true();
     });
     it('supports multiple projects', function() {
       var projectOne = 'one';
@@ -156,10 +157,10 @@ describe('Parameters', function() {
       var destinationOne = 'ssh://a.a/one';
       var destinationTwo = 'ssh://b.b/two';
       var parameters = new Parameters();
-      parameters.gitCloneProject(projectOne, destinationOne);
-      parameters.gitCloneProject(projectTwo, destinationTwo);
-      should(parameters.gitCloneProject(projectOne).equals(destinationOne)).be.true();
-      should(parameters.gitCloneProject(projectTwo).equals(destinationTwo)).be.true();
+      parameters.projectCloneUrl(projectOne, destinationOne);
+      parameters.projectCloneUrl(projectTwo, destinationTwo);
+      should(parameters.projectCloneUrl(projectOne).equals(destinationOne)).be.true();
+      should(parameters.projectCloneUrl(projectTwo).equals(destinationTwo)).be.true();
     });
   });
   describe('ref', function() {
@@ -224,52 +225,52 @@ describe('Parameters', function() {
       });
     });
   });
-  describe('gitClonePath', function() {
+  describe('cloneTo', function() {
     it('is function', function() {
       var parameters = new Parameters();
-      should(parameters.gitClonePath).be.Function();
+      should(parameters.cloneTo).be.Function();
     });
-    it('derives from gitCloneProject()', function() {
+    it('derives from projectCloneUrl()', function() {
       var project = 'project';
       var parameters = new Parameters();
-      parameters.gitCloneProject(project, 'ssh://somewhere:5678/project.git');
+      parameters.projectCloneUrl(project, 'ssh://somewhere:5678/project.git');
       parameters.project(project);
-      should(parameters.gitClonePath()).be.equal('projects/somewhere/5678/project.git');
+      should(parameters.cloneTo()).be.equal('projects/somewhere/5678/project.git/git');
     });
-    it('derives from gitCloneProject() without port number', function() {
+    it('derives from projectCloneUrl() without port number', function() {
       var project = 'project';
       var parameters = new Parameters();
-      parameters.gitCloneProject(project, 'ssh://somewhere/project.git');
+      parameters.projectCloneUrl(project, 'ssh://somewhere/project.git');
       parameters.project(project);
-      should(parameters.gitClonePath()).be.equal('projects/somewhere/default/project.git');
+      should(parameters.cloneTo()).be.equal('projects/somewhere/default/project.git/git');
     });
-    it('derives from gitCloneProject() with username', function() {
+    it('derives from projectCloneUrl() with username', function() {
       var project = 'project';
       var parameters = new Parameters();
-      parameters.gitCloneProject(project, 'ssh://someone@somewhere:44444/project.git');
+      parameters.projectCloneUrl(project, 'ssh://someone@somewhere:44444/project.git');
       parameters.project(project);
-      should(parameters.gitClonePath()).be.equal('projects/somewhere/44444/project.git');
+      should(parameters.cloneTo()).be.equal('projects/somewhere/44444/project.git/git');
     });
   });
-  describe('gitCloneBranch', function() {
+  describe('branch', function() {
     it('is function', function() {
       var parameters = new Parameters();
-      should(parameters.gitCloneBranch).be.Function();
+      should(parameters.branch).be.Function();
     });
     it('builds from change() and patch()', function() {
       var parameters = new Parameters();
       parameters.change(5);
       parameters.patch(3);
-      should(parameters.gitCloneBranch()).be.equal('5/3');
+      should(parameters.branch()).be.equal('5/3');
     });
     it('returns undefined if no change() or patch()', function() {
       var parameters = new Parameters();
-      should(parameters.gitCloneBranch()).be.undefined();
+      should(parameters.branch()).be.undefined();
       parameters.change(6);
-      should(parameters.gitCloneBranch()).be.undefined();
+      should(parameters.branch()).be.undefined();
       parameters = new Parameters();
       parameters.patch(8);
-      should(parameters.gitCloneBranch()).be.undefined();
+      should(parameters.branch()).be.undefined();
     });
   })
 });
