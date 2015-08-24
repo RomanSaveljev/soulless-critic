@@ -3,274 +3,370 @@ var should = require('should');
 var URI = require('URIjs');
 
 describe('Parameters', function() {
-  describe('change', function() {
+  describe('review', function() {
+    var parameters = new Parameters();
     it('is function', function() {
-      var parameters = new Parameters();
-      should(parameters.change).be.Function();
+      should(parameters.review).be.Function();
     });
-    it('extracts eventData.change.number', function() {
-      var parameters = new Parameters();
-      parameters.eventData = {};
-      parameters.eventData.change = {};
-      parameters.eventData.change.number = 8;
-      should(parameters.change()).be.equal(8);
-    });
-    it('plants eventData.change.number', function() {
-      var parameters = new Parameters();
-      parameters.change(7);
-      should(parameters.eventData).be.Object();
-      should(parameters.eventData.change).be.Object();
-      should(parameters.eventData.change.number).be.equal(7);
+    it('returns object', function() {
+      should(parameters.review()).be.Object();
     });
   });
-  describe('patch', function() {
+  describe('review().change', function() {
+    var parameters;
+    beforeEach(function() {
+      parameters = new Parameters();
+    });
     it('is function', function() {
-      var parameters = new Parameters();
-      should(parameters.patch).be.Function();
+      should(parameters.review().change).be.Function();
     });
-    it('extracts eventData.patchSet.number', function() {
-      var parameters = new Parameters();
-      parameters.eventData = {};
-      parameters.eventData.patchSet = {};
-      parameters.eventData.patchSet.number = 19;
-      should(parameters.patch()).be.equal(19);
+    it('returns undefined by default', function() {
+      should(parameters.review().change()).be.undefined();
     });
-    it('plants eventData.patchSet.number', function() {
-      var parameters = new Parameters();
-      parameters.patch(72);
-      should(parameters.eventData).be.Object();
-      should(parameters.eventData.patchSet).be.Object();
-      should(parameters.eventData.patchSet.number).be.equal(72);
+    it('stores passed value', function() {
+      parameters.review().change(12);
+      should(parameters.review().change()).be.equal(12);
     });
   });
-  describe('project', function() {
+  describe('review().patch', function() {
+    var parameters;
+    beforeEach(function() {
+      parameters = new Parameters();
+    });
     it('is function', function() {
-      var parameters = new Parameters();
-      should(parameters.project).be.Function();
+      should(parameters.review().patch).be.Function();
     });
-    it('extracts eventData.change.project', function() {
-      var project = 'my-project';
-      var parameters = new Parameters();
-      parameters.eventData = {};
-      parameters.eventData.change = {};
-      parameters.eventData.change.project = project;
-      should(parameters.project()).be.equal(project);
+    it('returns undefined by default', function() {
+      should(parameters.review().patch()).be.undefined();
     });
-    it('plants eventData.change.project', function() {
-      var project = 'cool-stuff';
-      var parameters = new Parameters();
-      parameters.project(project);
-      should(parameters.eventData).be.Object();
-      should(parameters.eventData.change).be.Object();
-      should(parameters.eventData.change.project).be.equal(project);
+    it('stores passed value', function() {
+      parameters.review().patch(3);
+      should(parameters.review().patch()).be.equal(3);
     });
   });
-  describe('gitServer', function() {
+  describe('review().ref', function() {
+    var parameters;
+    beforeEach(function() {
+      parameters = new Parameters();
+    });
     it('is function', function() {
-      var parameters = new Parameters();
-      should(parameters.gitServer).be.Function();
+      should(parameters.review().ref).be.Function();
     });
-    it('extracts git.server', function() {
-      var server = 'ssh://john@localhost:29418';
-      var parameters = new Parameters();
-      parameters.git = {};
-      parameters.git.server = server;
-      should(parameters.gitServer().equals(server)).be.true();
+    it('returns undefined by default', function() {
+      should(parameters.review().ref()).be.undefined();
     });
-    it('plants git.server', function() {
-      var server = 'ssh://hacker@google.com:1337';
-      var parameters = new Parameters();
-      parameters.gitServer(server);
-      should(parameters.git.server).be.equal(server);
+    it('returns undefined if patch not set', function() {
+      parameters.review().change(4);
+      should(parameters.review().ref()).be.undefined();
     });
-    it('returns URI object', function() {
-      var parameters = new Parameters();
-      parameters.gitServer('http://www.abc.com');
-      should(parameters.gitServer()).be.instanceof(URI);
+    it('returns undefined if change not set', function() {
+      parameters.review().patch(4);
+      should(parameters.review().ref()).be.undefined();
     });
-    it('accepts URI object', function() {
-      var url = 'ssh://blackho.le';
-      var parameters = new Parameters();
-      parameters.gitServer(URI(url));
-      should(parameters.gitServer().equals(url)).be.true();
-    });
-  });
-  describe('projectCloneUrl', function() {
-    it('is function', function() {
-      var parameters = new Parameters();
-      should(parameters.projectCloneUrl).be.Function();
-    });
-    it('extracts git.clone[project]', function() {
-      var clone = 'ssh://john@localhost:29418/super-stuff.git';
-      var project = 'super-stuff';
-      var parameters = new Parameters();
-      parameters.git = {};
-      parameters.git.project = {};
-      parameters.git.project.clone = {};
-      parameters.git.project.clone[project] = clone;
-      should(parameters.projectCloneUrl(project).equals(clone)).be.true();
-    });
-    it('plants git.clone[project]', function() {
-      var clone = 'ssh://smeagol@misty-mountains:29418/my-preciouss.git';
-      var project = 'my-precioussss';
-      var parameters = new Parameters();
-      parameters.projectCloneUrl(project, clone);
-      should(parameters.git.project.clone[project]).be.equal(clone);
-    });
-    it('returns URL for project() by default', function() {
-      var clone = 'http://www.google.com/hidden.git';
-      var project = 'hidden';
-      var parameters = new Parameters();
-      parameters.project(project);
-      parameters.projectCloneUrl(project, clone);
-      should(parameters.projectCloneUrl().equals(clone)).be.true();
-    });
-    it('returns undefined, when project is not known', function() {
-      var parameters = new Parameters();
-      should(parameters.projectCloneUrl()).be.undefined();
-    });
-    it('builds default project clone url', function() {
-      var parameters = new Parameters();
-      parameters.gitServer('ssh://www.microsoft.com:6666');
-      parameters.project('domination-plans');
-      var expected = 'ssh://www.microsoft.com:6666/domination-plans';
-      should(parameters.projectCloneUrl().equals(expected)).be.true();
-    });
-    it('returns URI object', function() {
-      var parameters = new Parameters();
-      parameters.gitServer('ssh://www.microsoft.com:6666');
-      parameters.project('domination-plans');
-      should(parameters.projectCloneUrl()).be.instanceof(URI);
-    });
-    it('assignment overrides defaults', function() {
-      var project = 'cats';
-      var destination = 'ssh://cats.co/cats';
-      var parameters = new Parameters();
-      parameters.gitServer('ssh://www.microsoft.com:6666');
-      parameters.project(project);
-      parameters.projectCloneUrl(project, destination);
-      should(parameters.projectCloneUrl().equals(destination)).be.true();
-    });
-    it('supports multiple projects', function() {
-      var projectOne = 'one';
-      var projectTwo = 'two';
-      var destinationOne = 'ssh://a.a/one';
-      var destinationTwo = 'ssh://b.b/two';
-      var parameters = new Parameters();
-      parameters.projectCloneUrl(projectOne, destinationOne);
-      parameters.projectCloneUrl(projectTwo, destinationTwo);
-      should(parameters.projectCloneUrl(projectOne).equals(destinationOne)).be.true();
-      should(parameters.projectCloneUrl(projectTwo).equals(destinationTwo)).be.true();
-    });
-  });
-  describe('ref', function() {
-    it('is function', function() {
-      var parameters = new Parameters();
-      should(parameters.ref).be.Function();
-    });
-    it('extracts eventData.patchSet.ref', function() {
-      var ref = 'refs/changes/19/19/2';
-      var parameters = new Parameters();
-      parameters.eventData = {};
-      parameters.eventData.patchSet = {};
-      parameters.eventData.patchSet.ref = ref;
-      should(parameters.ref()).be.equal(ref);
-    });
-    it('plants eventData.patchSet.ref', function() {
-      var ref = 'refs/changes/03/103/2';
-      var parameters = new Parameters();
-      parameters.ref(ref);
-      should(parameters.eventData).be.Object();
-      should(parameters.eventData.patchSet).be.Object();
-      should(parameters.eventData.patchSet.ref).be.equal(ref);
+    it('returns undefined if patch not set', function() {
+      parameters.review().change(4);
+      should(parameters.review().ref()).be.undefined();
     });
     it('ref assignment overrides default', function() {
       var ref = 'refs/changes/05/1105/1';
-      var parameters = new Parameters();
-      parameters.change(4);
-      parameters.patch(2);
-      parameters.ref(ref);
-      should(parameters.ref()).be.equal(ref);
+      parameters.review().change(4);
+      parameters.review().patch(2);
+      parameters.review().ref(ref);
+      should(parameters.review().ref()).be.equal(ref);
     });
-    describe('builds default refspec', function() {
-      it('patch number is respected', function() {
-        var parameters = new Parameters();
-        parameters.change(2);
-        parameters.patch(1);
-        should(parameters.ref()).be.equal('refs/changes/02/2/1');
-        parameters.patch(10);
-        should(parameters.ref()).be.equal('refs/changes/02/2/10');
-        parameters.patch(100);
-        should(parameters.ref()).be.equal('refs/changes/02/2/100');
-      });
-      it('change number is respected', function() {
-        var parameters = new Parameters();
-        parameters.patch(1);
-        parameters.change(1);
-        should(parameters.ref()).be.equal('refs/changes/01/1/1');
-        parameters.change(12);
-        should(parameters.ref()).be.equal('refs/changes/12/12/1');
-        parameters.change(215);
-        should(parameters.ref()).be.equal('refs/changes/15/215/1');
-      });
-      it('returns undefined if no patch', function() {
-        var parameters = new Parameters();
-        parameters.change(2);
-        should(parameters.ref()).be.undefined();
-      });
-      it('returns undefined if no change', function() {
-        var parameters = new Parameters();
-        parameters.patch(3);
-        should(parameters.ref()).be.undefined();
-      });
+    it('default: patch number is respected', function() {
+      parameters.review().change(2);
+      parameters.review().patch(1);
+      should(parameters.review().ref()).be.equal('refs/changes/02/2/1');
+      parameters.review().patch(10);
+      should(parameters.review().ref()).be.equal('refs/changes/02/2/10');
+      parameters.review().patch(100);
+      should(parameters.review().ref()).be.equal('refs/changes/02/2/100');
+    });
+    it('default: change number is respected', function() {
+      parameters.review().patch(1);
+      parameters.review().change(1);
+      should(parameters.review().ref()).be.equal('refs/changes/01/1/1');
+      parameters.review().change(12);
+      should(parameters.review().ref()).be.equal('refs/changes/12/12/1');
+      parameters.review().change(215);
+      should(parameters.review().ref()).be.equal('refs/changes/15/215/1');
     });
   });
-  describe('cloneTo', function() {
-    it('is function', function() {
-      var parameters = new Parameters();
-      should(parameters.cloneTo).be.Function();
-    });
-    it('derives from projectCloneUrl()', function() {
-      var project = 'project';
-      var parameters = new Parameters();
-      parameters.projectCloneUrl(project, 'ssh://somewhere:5678/project.git');
-      parameters.project(project);
-      should(parameters.cloneTo()).be.equal('projects/somewhere/5678/project.git/git');
-    });
-    it('derives from projectCloneUrl() without port number', function() {
-      var project = 'project';
-      var parameters = new Parameters();
-      parameters.projectCloneUrl(project, 'ssh://somewhere/project.git');
-      parameters.project(project);
-      should(parameters.cloneTo()).be.equal('projects/somewhere/default/project.git/git');
-    });
-    it('derives from projectCloneUrl() with username', function() {
-      var project = 'project';
-      var parameters = new Parameters();
-      parameters.projectCloneUrl(project, 'ssh://someone@somewhere:44444/project.git');
-      parameters.project(project);
-      should(parameters.cloneTo()).be.equal('projects/somewhere/44444/project.git/git');
-    });
-  });
-  describe('branch', function() {
-    it('is function', function() {
-      var parameters = new Parameters();
-      should(parameters.branch).be.Function();
-    });
-    it('builds from change() and patch()', function() {
-      var parameters = new Parameters();
-      parameters.change(5);
-      parameters.patch(3);
-      should(parameters.branch()).be.equal('5/3');
-    });
-    it('returns undefined if no change() or patch()', function() {
-      var parameters = new Parameters();
-      should(parameters.branch()).be.undefined();
-      parameters.change(6);
-      should(parameters.branch()).be.undefined();
+  describe('review().project', function() {
+    var parameters;
+    beforeEach(function() {
       parameters = new Parameters();
-      parameters.patch(8);
-      should(parameters.branch()).be.undefined();
     });
-  })
+    it('is function', function() {
+      should(parameters.review().project).be.Function();
+    });
+    it('returns undefined by default', function() {
+      should(parameters.review().project()).be.undefined();
+    });
+    it('stores assigned value', function() {
+      parameters.review().project('my-project');
+      should(parameters.review().project()).be.equal('my-project');
+    });
+  });
+  describe('review().modified', function() {
+    var parameters;
+    beforeEach(function() {
+      parameters = new Parameters();
+    });
+    it('is function', function() {
+      should(parameters.review().modified).be.Function();
+    });
+    it('returns array', function() {
+      should(parameters.review().modified()).be.Array();
+    });
+  });
+  describe('review().message', function() {
+    var parameters;
+    beforeEach(function() {
+      parameters = new Parameters();
+    });
+    it('is function', function() {
+      should(parameters.review().message).be.Function();
+    });
+    it('returns undefined by default', function() {
+      should(parameters.review().message()).be.undefined();
+    });
+    it('stores assigned value', function() {
+      parameters.review().message('Message');
+      should(parameters.review().message()).be.equal('Message');
+    });
+  });
+  describe('review().comments', function() {
+    var parameters;
+    beforeEach(function() {
+      parameters = new Parameters();
+    });
+    it('is function', function() {
+      should(parameters.review().comments).be.Function();
+    });
+    it('requires a parameter', function() {
+      should(parameters.review().comments).throw();
+    });
+    it('allocates array per entry', function() {
+      var one = parameters.review().comments('one');
+      var two = parameters.review().comments('two');
+      should(one).be.Array();
+      should(two).be.Array();
+      should(one).have.length(0);
+      two.push(0);
+      should(parameters.review().comments('two')).have.length(1);
+      should(parameters.review().comments('one')).have.length(0);
+      one.push(false);
+      should(parameters.review().comments('one')).have.length(1);
+    });
+  });
+  describe('configuration', function() {
+    var parameters;
+    beforeEach(function() {
+      parameters = new Parameters();
+    });
+    it('is function', function() {
+      should(parameters.configuration).be.Function();
+    });
+    it('returns object', function() {
+      should(parameters.configuration()).be.Object();
+    });
+  });
+  describe('configuration().git', function() {
+    var parameters;
+    beforeEach(function() {
+      parameters = new Parameters();
+    });
+    it('is function', function() {
+      should(parameters.configuration().git).be.Function();
+    });
+    it('returns object', function() {
+      should(parameters.configuration().git()).be.Object();
+    });
+  });
+  describe('configuration().git().server', function() {
+    var parameters;
+    beforeEach(function() {
+      parameters = new Parameters();
+    });
+    it('is function', function() {
+      should(parameters.configuration().git().server).be.Function();
+    });
+    it('returns undefined by default', function() {
+      should(parameters.configuration().git().server()).be.undefined();
+    });
+    it('accepts strings', function() {
+      parameters.configuration().git().server('ssh://localhost:12783');
+      should(parameters.configuration().git().server().equals('ssh://localhost:12783')).be.true();
+    });
+    it('accepts URI', function() {
+      parameters.configuration().git().server(URI('ssh://localhost:12783'));
+      should(parameters.configuration().git().server().equals('ssh://localhost:12783')).be.true();
+    });
+  });
+  describe('configuration().git().project', function() {
+    var parameters;
+    beforeEach(function() {
+      parameters = new Parameters();
+    });
+    it('is function', function() {
+      should(parameters.configuration().git().project).be.Function();
+    });
+    it('returns object', function() {
+      should(parameters.configuration().git().project()).be.Object();
+    });
+    it('accepts project name and returns object', function() {
+      should(parameters.configuration().git().project('first')).be.Object();
+    });
+  });
+  describe('configuration().git().project().url', function() {
+    var parameters;
+    beforeEach(function() {
+      parameters = new Parameters();
+    });
+    it('is function', function() {
+      should(parameters.configuration().git().project().url).be.Function();
+    });
+    it('returns undefined, if no project', function() {
+      should(parameters.configuration().git().project().url()).be.undefined();
+    });
+    it('returns undefined, if no server', function() {
+      should(parameters.configuration().git().project('first').url()).be.undefined();
+    });
+    it('builds default url for a project', function() {
+      parameters.configuration().git().server('ssh://localhost');
+      should(parameters.configuration().git().project('first').url().equals('ssh://localhost/first')).be.true();
+    });
+    it('stores url for project', function() {
+      parameters.configuration().git().project('first').url('ssh://localhost/some-path');
+      should(parameters.configuration().git().project('first').url().equals('ssh://localhost/some-path')).be.true();
+    });
+  });
+  describe('configuration().checkstyle', function() {
+    var parameters;
+    beforeEach(function() {
+      parameters = new Parameters();
+    });
+    it('is function', function() {
+      should(parameters.configuration().checkstyle).be.Function();
+    });
+    it('returns object', function() {
+      should(parameters.configuration().checkstyle()).be.Object();
+    });
+  });
+  describe('configuration().checkstyle().enabled', function() {
+    var parameters;
+    beforeEach(function() {
+      parameters = new Parameters();
+    });
+    it('is function', function() {
+      should(parameters.configuration().checkstyle().enabled).be.Function();
+    });
+    it('returns false by default', function() {
+      should(parameters.configuration().checkstyle().enabled()).be.equal(false);
+    });
+    it('stores assigned value', function() {
+      parameters.configuration().checkstyle().enabled(true);
+      should(parameters.configuration().checkstyle().enabled()).be.equal(true);
+    });
+  });
+  describe('configuration().checkstyle().jar', function() {
+    var parameters;
+    beforeEach(function() {
+      parameters = new Parameters();
+    });
+    it('is function', function() {
+      should(parameters.configuration().checkstyle().jar).be.Function();
+    });
+    it('returns undefined by default', function() {
+      should(parameters.configuration().checkstyle().jar()).be.undefined();
+    });
+    it('stores assigned value', function() {
+      parameters.configuration().checkstyle().jar('checkstyle.jar');
+      should(parameters.configuration().checkstyle().jar()).be.equal('checkstyle.jar');
+    });
+  });
+  describe('configuration().checkstyle().defaultXml', function() {
+    var parameters;
+    beforeEach(function() {
+      parameters = new Parameters();
+    });
+    it('is function', function() {
+      should(parameters.configuration().checkstyle().defaultXml).be.Function();
+    });
+    it('returns something by default', function() {
+      should(parameters.configuration().checkstyle().defaultXml()).not.be.empty();
+    });
+    it('stores assigned value', function() {
+      parameters.configuration().checkstyle().defaultXml('def.xml');
+      should(parameters.configuration().checkstyle().defaultXml()).be.equal('def.xml');
+    });
+  });
+  describe('configuration().checkstyle().xml', function() {
+    var parameters;
+    beforeEach(function() {
+      parameters = new Parameters();
+    });
+    it('is function', function() {
+      should(parameters.configuration().checkstyle().xml).be.Function();
+    });
+    it('returns checkstyle.xml by default', function() {
+      should(parameters.configuration().checkstyle().xml()).be.equal('checkstyle.xml');
+    });
+    it('stores assigned value', function() {
+      parameters.configuration().checkstyle().xml('xml.xml');
+      should(parameters.configuration().checkstyle().xml()).be.equal('xml.xml');
+    });
+  });
+  describe('repository', function() {
+    var parameters;
+    beforeEach(function() {
+      parameters = new Parameters();
+    });
+    it('is function', function() {
+      should(parameters.repository).be.Function();
+    });
+    it('returns object', function() {
+      should(parameters.repository()).be.Object();
+    });
+  });
+  describe('repository().url', function() {
+    var parameters;
+    beforeEach(function() {
+      parameters = new Parameters();
+    });
+    it('is function', function() {
+      should(parameters.repository().url).be.Function();
+    });
+    it('returns undefined, if no project', function() {
+      should(parameters.repository().url()).be.undefined();
+    });
+    it('returns default url for current project', function() {
+      parameters.review().project('my-proj');
+      parameters.configuration().git().server('ssh://localhost:3456');
+      should(parameters.repository().url().equals('ssh://localhost:3456/my-proj')).be.true();
+    });
+    it('return configured url for current project', function() {
+      parameters.review().project('my-proj');
+      parameters.configuration().git().project('my-proj').url('ssh://google.com:55551/my-proj');
+      should(parameters.repository().url().equals('ssh://google.com:55551/my-proj')).be.true();
+    });
+  });
+  describe('repository().path', function() {
+    var parameters;
+    beforeEach(function() {
+      parameters = new Parameters();
+    });
+    it('is function', function() {
+      should(parameters.repository().path).be.Function();
+    });
+    it('returns undefined by default', function() {
+      should(parameters.repository().path()).be.undefined();
+    });
+    it('stores assigned value', function() {
+      parameters.repository().path('a/b/c/d');
+      should(parameters.repository().path()).be.equal('a/b/c/d');
+    });
+  });
 });
