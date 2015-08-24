@@ -12,7 +12,7 @@ FILTER ?= .+
 
 test-all:
 	@NODE_ENV=test $(MOCHA) \
-		--reporter $(REPORTER) --recursive -g $(FILTER)
+		--reporter $(REPORTER) --recursive -g '$(FILTER)'
 
 cov-all:
 	@NODE_ENV=test $(MOCHA) \
@@ -21,4 +21,3 @@ cov-all:
 travis-test:
 	@NODE_ENV=test $(MOCHA) \
 		--reporter travis-cov --require blanket --recursive
-
